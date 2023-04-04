@@ -14,8 +14,6 @@ import (
 	"strings"
 )
 
-var page = 0
-
 type Config struct {
 	Host     string `json:"host"`
 	Port     int    `json:"port"`
@@ -29,7 +27,10 @@ func init() {
 	var config *Config
 	f, err := os.OpenFile("./helpers/config.json", os.O_RDONLY, 0644)
 	if err != nil {
-		os.Create("./helpers/config.json")
+		_, err := os.Create("./helpers/config.json")
+		if err != nil {
+			return
+		}
 	}
 	_ = json.NewDecoder(f).Decode(&config)
 	if config.Host == "" || config.Port == 0 || config.Username == "" || config.Password == "" || config.Database == "" {
@@ -66,14 +67,6 @@ func main() {
 
 	core.PrevPage()
 
-}
-
-type info struct {
-	Host         string
-	Port         string
-	Username     string
-	Password     string
-	DatabaseName string
 }
 
 func ParseDB() (*sql.DB, error) {

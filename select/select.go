@@ -28,9 +28,9 @@ func (i item) FilterValue() string { return "" }
 
 type itemDelegate struct{}
 
-func (d itemDelegate) Height() int                               { return 1 }
-func (d itemDelegate) Spacing() int                              { return 0 }
-func (d itemDelegate) Update(msg tea.Msg, m *list.Model) tea.Cmd { return nil }
+func (d itemDelegate) Height() int                             { return 1 }
+func (d itemDelegate) Spacing() int                            { return 0 }
+func (d itemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
 	i, ok := listItem.(item)
 	if !ok {
@@ -46,7 +46,7 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 		}
 	}
 
-	fmt.Fprint(w, fn(str))
+	_, _ = fmt.Fprint(w, fn(str))
 }
 
 type model struct {
@@ -83,7 +83,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				types.Page++
 			}
 			if string(i) == "Delete" {
-				types.Db.Exec("DELETE FROM "+types.TableSelection+" WHERE "+types.TablePrimary+" = $1", Title)
+				_, _ = types.Db.Exec("DELETE FROM "+types.TableSelection+" WHERE "+types.TablePrimary+" = $1", Title)
 				types.Page--
 			} else if string(i) == "Update" {
 
@@ -113,7 +113,7 @@ func (m model) View() string {
 
 func DropDown(_items []string, title string) {
 	Title = title
-	items := []list.Item{}
+	items := make([]list.Item, 0)
 	for _, i := range _items {
 		items = append(items, item(i))
 	}
