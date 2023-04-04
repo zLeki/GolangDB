@@ -56,11 +56,9 @@ func init() {
 			panic(err)
 		}
 		fmt.Println("Setup Complete\nYou can now use GopherDB")
-		select {}
-
-	} else {
-		types.BaseStruct = types.Base{Host: config.Host, Port: strconv.Itoa(config.Port), Username: config.Username, Password: config.Password, DataBaseName: config.Database}
 	}
+
+	types.BaseStruct = types.NewConnection(config.Host, config.Port, config.Username, config.Password, config.Database)
 }
 func main() {
 	_, _ = ParseDB()
