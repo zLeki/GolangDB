@@ -6,9 +6,7 @@ var (
 	BaseStruct     = Base{}
 	TableSelection string
 	TablePrimary   string
-	Unit           string
 	Db             *sql.DB
-	Name           string
 	Page           = 0
 )
 
