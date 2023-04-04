@@ -55,15 +55,13 @@ func (m model) View() string {
 }
 
 func Table(columnsText []string, rowsText []string) {
-	columns := []table.Column{}
+	columns := make([]table.Column, 0)
 	for _, v := range columnsText {
 		columns = append(columns, table.Column{Title: v, Width: 10})
 	}
 	types.TablePrimary = columnsText[0]
 
-	rows := []table.Row{
-		//{"100", "Montreal", "Canada", "4,276,526"},
-	}
+	rows := make([]table.Row, 0)
 	for _, v := range rowsText {
 		a := strings.Split(v, "|")
 		row := table.Row{}

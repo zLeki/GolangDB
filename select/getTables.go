@@ -17,14 +17,20 @@ func GetTableNames(db *sql.DB) []string {
 		AND
 			table_schema NOT IN ('pg_catalog', 'information_schema');
 	`)
-	defer rows.Close()
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+
+		}
+	}(rows)
 	if err != nil {
 		log.Fatalln("Error connecting to database", err)
 	}
 	var tableNames []string
 	for rows.Next() {
 		var table string
-		rows.Scan(&table)
+		_ = rows.Scan(&table)
+		// Deprecated: The rule Title uses for word boundaries does not handle Unicode punctuation properly. Use golang.org/x/text/cases instead.
 		table = strings.Title(strings.Replace(table, "public.", "", -1))
 		tableNames = append(tableNames, table)
 	}
