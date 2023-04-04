@@ -1,15 +1,29 @@
-package build
+package builder
 
 import (
 	"GopherDB/types"
+	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	"strings"
 )
 
 func BuildTable(db *sql.DB) ([]string, []string) {
-	rows, err := db.Query(`SELECT * FROM "public"."` + strings.ToLower(types.TableSelection) + `" LIMIT 300 OFFSET 0;`)
-	defer rows.Close()
+	tableName := fmt.Sprintf("public.%s", strings.ToLower(types.TableSelection))
+	const (
+		maxRows = 300
+		offset  = 0
+	)
+	query := fmt.Sprintf("SELECT * FROM %s LIMIT $1 OFFSET $2;", tableName)
+	ctx := context.Background()
+	rows, err := db.QueryContext(ctx, query, maxRows, offset)
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}(rows)
 	if err != nil {
 		log.Fatalln("Error connecting to database", err)
 	}
@@ -24,7 +38,7 @@ func BuildTable(db *sql.DB) ([]string, []string) {
 		scanArgs[i] = &values[i]
 
 	}
-	var row = []string{}
+	var row = make([]string, 0)
 	for rows.Next() {
 		err = rows.Scan(scanArgs...)
 		if err != nil {

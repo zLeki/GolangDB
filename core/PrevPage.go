@@ -1,7 +1,7 @@
 package core
 
 import (
-	"GopherDB/build"
+	"GopherDB/builder"
 	"GopherDB/input"
 	DropDown2 "GopherDB/select"
 	"GopherDB/table"
@@ -43,7 +43,7 @@ func PrevPage() {
 			i = 0
 		} else if types.Page == 1 && i != 1 {
 			clear[runtime.GOOS]()
-			column, rows := build.BuildTable(types.Db)
+			column, rows := builder.BuildTable(types.Db)
 			table.Table(column, rows)
 			i = 1
 		} else {
