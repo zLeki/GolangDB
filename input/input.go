@@ -36,6 +36,10 @@ type Questions struct {
 	Password    bool
 }
 
+func NewQuestions(placeholder string, charLimit int, isPassword bool) Questions {
+	return Questions{Placeholder: placeholder, CharLimit: charLimit, Password: isPassword}
+}
+
 var questions []Questions
 
 func initialModel() model {
@@ -77,11 +81,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.cursorMode > textinput.CursorHide {
 				m.cursorMode = textinput.CursorBlink
 			}
-			cmds := make([]tea.Cmd, len(m.inputs))
+			commands := make([]tea.Cmd, len(m.inputs))
 			for i := range m.inputs {
-				cmds[i] = m.inputs[i].SetCursorMode(m.cursorMode)
+				commands[i] = m.inputs[i].SetCursorMode(m.cursorMode)
 			}
-			return m, tea.Batch(cmds...)
+			return m, tea.Batch(commands...)
 
 		// Set focus to next input
 		case "tab", "shift+tab", "enter", "up", "down":
@@ -128,11 +132,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.focusIndex = len(m.inputs)
 			}
 
-			cmds := make([]tea.Cmd, len(m.inputs))
+			commands := make([]tea.Cmd, len(m.inputs))
 			for i := 0; i <= len(m.inputs)-1; i++ {
 				if i == m.focusIndex {
 					// Set focused state
-					cmds[i] = m.inputs[i].Focus()
+					commands[i] = m.inputs[i].Focus()
 					m.inputs[i].PromptStyle = focusedStyle
 					m.inputs[i].TextStyle = focusedStyle
 					continue
@@ -143,7 +147,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.inputs[i].TextStyle = noStyle
 			}
 
-			return m, tea.Batch(cmds...)
+			return m, tea.Batch(commands...)
 		}
 	}
 
@@ -153,16 +157,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m *model) updateInputs(msg tea.Msg) tea.Cmd {
-	cmds := make([]tea.Cmd, len(m.inputs))
+func (m model) updateInputs(msg tea.Msg) tea.Cmd {
+	commands := make([]tea.Cmd, len(m.inputs))
 
 	// Only text inputs with Focus() set will respond, so it's safe to simply
 	// update all of them here without any further logic.
 	for i := range m.inputs {
-		m.inputs[i], cmds[i] = m.inputs[i].Update(msg)
+		m.inputs[i], commands[i] = m.inputs[i].Update(msg)
 	}
 
-	return tea.Batch(cmds...)
+	return tea.Batch(commands...)
 }
 
 func (m model) View() string {
@@ -179,7 +183,7 @@ func (m model) View() string {
 	if m.focusIndex == len(m.inputs) {
 		button = &focusedButton
 	}
-	fmt.Fprintf(&b, "\n\n%s\n\n", *button)
+	_, _ = fmt.Fprintf(&b, "\n\n%s\n\n", *button)
 
 	b.WriteString(helpStyle.Render("cursor mode is "))
 	b.WriteString(cursorModeHelpStyle.Render(m.cursorMode.String()))
@@ -190,8 +194,8 @@ func (m model) View() string {
 
 var a int
 
-func Input(questionstoask []Questions) {
-	questions = questionstoask
+func Input(questionsToAsk []Questions) {
+	questions = questionsToAsk
 	a = len(questions)
 	if _, err := tea.NewProgram(initialModel()).Run(); err != nil {
 		fmt.Printf("could not start program: %s\n", err)
